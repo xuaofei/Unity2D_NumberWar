@@ -178,6 +178,8 @@
 		
 		void installEvents()
 		{
+			Dbg.WARNING_MSG("installEvents:installEvents");
+
 			Event.registerIn("createAccount", this, "createAccount");
 			Event.registerIn("login", this, "login");
 			Event.registerIn("reLoginBaseapp", this, "reLoginBaseapp");

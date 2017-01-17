@@ -34,7 +34,7 @@ public class LoginController : KBEMain {
 			login (UserInfo.GetSingleton ().userName,UserInfo.GetSingleton ().userPwd);
 		}
 
-
+		o =GameObject.Find ("progress");
 
 		ip = "139.199.189.66";
 
@@ -43,11 +43,14 @@ public class LoginController : KBEMain {
 		
 	public override void installEvents()
 	{
-		o =GameObject.Find ("progress");
+		
 		KBEngine.Event.registerOut("onLoginBaseappFailed", this, "onLoginBaseappFailed");
 		KBEngine.Event.registerOut("onLoginSuccessfully", this, "onLoginSuccessfully");
 		KBEngine.Event.registerOut("onCreateAccountResult", this, "onCreateAccountResult");
 		KBEngine.Event.registerOut("onDisableConnect", this, "onDisableConnect");
+		KBEngine.Event.registerOut("onConnectStatus", this, "onConnectStatus");
+		KBEngine.Event.registerOut("onLoginBaseapp", this, "onLoginBaseapp");
+
 
 	}
 
@@ -97,9 +100,22 @@ public class LoginController : KBEMain {
 		print("onDisableConnect");
 	}
 
+	public void onConnectStatus(bool success)
+	{
+		if(!success)
+			print("connect(" + KBEngineApp.app.getInitArgs().ip + ":" + KBEngineApp.app.getInitArgs().port + ") is error! (连接错误)");
+		else
+			print("connect successfully, please wait...(连接成功，请等候...)");
+	}
+
 	public void onLoginSuccessfully(System.UInt64 rndUUID, System.Int32 eid, Account accountEntity)
 	{
 		print("login is successfully!(登陆成功!)");
+	}
+
+	public void onLoginBaseapp()
+	{
+		print("connect to loginBaseapp, please wait...(连接到网关， 请稍后...)");
 	}
 
 	private void register(string userName,string userPwd)
@@ -109,7 +125,6 @@ public class LoginController : KBEMain {
 
 	private void login(string userName,string userPwd)
 	{
-		print ("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
 		KBEngine.Event.fireIn("login", userName, userPwd,System.Text.Encoding.UTF8.GetBytes("kbengine_unity3d_demo"));
 	}
 }

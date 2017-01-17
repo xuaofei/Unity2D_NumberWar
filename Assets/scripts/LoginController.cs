@@ -6,29 +6,56 @@ using UnityEngine;
 public class LoginController : KBEMain {
 
 	private GameObject o;
-	private bool   run = false;
 	public float speed = 50;
+
+
+	private string userName;
+	private string userPwd;
+
+	// Use this for initialization
+	void Start () 
+	{
+		MonoBehaviour.print("clientapp::start()");
+		installEvents();
+		initKBEngine();
+
 	
-	// Update is called once per frame
-	void Update () {
-		
+		if (UserInfo.GetSingleton ().userName == "") {
+			//创建账号
 
-		if (!run){
-			o =GameObject.Find ("progress");
-//			ip = "139.199.189.66";
-			KBEngine.Event.registerOut("onLoginBaseappFailed", this, "onLoginBaseappFailed");
-			KBEngine.Event.registerOut("onLoginSuccessfully", this, "onLoginSuccessfully");
-			KBEngine.Event.registerOut("onCreateAccountResult", this, "onCreateAccountResult");
-			KBEngine.Event.registerOut("onDisableConnect", this, "onDisableConnect");
+			userName = System.Guid.NewGuid().ToString("N");
+			userPwd = System.Guid.NewGuid ().ToString ("N").Substring (0,16);
 
-			run = true;
+			register(userName,userPwd);
+
+		} else {
+			//直接登录
+
+			login (UserInfo.GetSingleton ().userName,UserInfo.GetSingleton ().userPwd);
 		}
 
+
+
+		ip = "139.199.189.66";
+
+
+	}
+		
+	public override void installEvents()
+	{
+		o =GameObject.Find ("progress");
+		KBEngine.Event.registerOut("onLoginBaseappFailed", this, "onLoginBaseappFailed");
+		KBEngine.Event.registerOut("onLoginSuccessfully", this, "onLoginSuccessfully");
+		KBEngine.Event.registerOut("onCreateAccountResult", this, "onCreateAccountResult");
+		KBEngine.Event.registerOut("onDisableConnect", this, "onDisableConnect");
+
+	}
+
+	// Update is called once per frame
+	void Update () {
 		if (Input.GetKeyUp(KeyCode.Space))
 		{
-			string stringAccount = "yyxaf1";
-			string stringPasswd = "yy.p112389";
-			KBEngine.Event.fireIn("createAccount", stringAccount, stringPasswd,System.Text.Encoding.UTF8.GetBytes("kbengine_unity3d_demo"));
+			
 //			KBEngine.Event.fireIn ("createAccount",stringAccount, stringPasswd);
 			//KBEngine.Event.fireIn ("login",stringAccount, stringPasswd);
 		}
@@ -43,13 +70,21 @@ public class LoginController : KBEMain {
 
 	public void onCreateAccountResult(System.UInt16 retcode, byte[] datas)
 	{
-		if(retcode != 0)
+		//注册失败，账号已经存在。
+		if(retcode == 7)
 		{
+			//createAccount is error(注册账号错误)! err=SERVER_ERR_ACCOUNT_CREATE_FAILED [创建账号失败（已经存在一个相同的账号）。]
 			print("createAccount is error(注册账号错误)! err=" + KBEngineApp.app.serverErr(retcode));
-			return;
 		}
-		print("createAccount is successfully!(注册账号成功!)");
-	
+
+		if (retcode == 0 ){
+			UserInfo.GetSingleton ().userName = userName;
+			UserInfo.GetSingleton ().userPwd = userPwd;
+
+			login (UserInfo.GetSingleton ().userName,UserInfo.GetSingleton ().userPwd);
+
+			print("createAccount is successfully!(注册账号成功!)");
+		}
 	}
 
 	public void onLoginBaseappFailed(System.UInt16 failedcode)
@@ -65,5 +100,16 @@ public class LoginController : KBEMain {
 	public void onLoginSuccessfully(System.UInt64 rndUUID, System.Int32 eid, Account accountEntity)
 	{
 		print("login is successfully!(登陆成功!)");
+	}
+
+	private void register(string userName,string userPwd)
+	{
+		KBEngine.Event.fireIn("createAccount", userName, userPwd,System.Text.Encoding.UTF8.GetBytes("kbengine_unity3d_demo"));
+	}
+
+	private void login(string userName,string userPwd)
+	{
+		print ("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
+		KBEngine.Event.fireIn("login", userName, userPwd,System.Text.Encoding.UTF8.GetBytes("kbengine_unity3d_demo"));
 	}
 }

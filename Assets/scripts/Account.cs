@@ -6,12 +6,19 @@ using UnityEngine;
 
 public class Account : KBEngine.Entity  {
 
+	public static Account account = null;
 
-	void Start () {
+	public override void __init__()
+	{
 
+		Debug.Log ("Player 已经创建成功！");
+		account = this;
 	}
-	
-	void Update () {
-		
+
+
+
+	public void onTestFunction(string s) {
+		Debug.Log ("fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+//		baseCall ("reqAvatarList");
 	}
 }

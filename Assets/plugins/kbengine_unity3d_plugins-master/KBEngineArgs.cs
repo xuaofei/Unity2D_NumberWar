@@ -10,7 +10,7 @@
     public class KBEngineArgs 
     {
     	// 登录ip和端口
-		public string ip = "127.0.0.1";
+		public string ip = "139.199.189.66";
 		public int port = 20013;
 		
 		// 客户端类型

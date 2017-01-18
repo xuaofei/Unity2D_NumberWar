@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 
 [Serializable]
@@ -18,8 +23,29 @@ public class UserInfo
 	public static UserInfo GetSingleton () //(3)
 	{
 		if (_singleton == null)
-			_singleton = new UserInfo();
+			readFromFile ();
 		return _singleton;            
+	}
+
+
+	public static void readFromFile()
+	{
+		BinaryFormatter formater = new BinaryFormatter();
+		Stream stream = new FileStream("account.bin", FileMode.Open,FileAccess.Read, FileShare.None);
+		if (stream.Length == 0) {
+			_singleton = new UserInfo ();
+		} else {
+			_singleton = (UserInfo)formater.Deserialize(stream);
+		}
+		stream.Close();
+	}
+
+	public static void write2File()
+	{
+		BinaryFormatter formater = new BinaryFormatter();
+		Stream stream = new FileStream("account.bin", FileMode.Create,FileAccess.Write, FileShare.None);
+		formater.Serialize(stream, UserInfo.GetSingleton());
+		stream.Close();
 	}
 
 

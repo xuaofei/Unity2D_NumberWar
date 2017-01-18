@@ -600,6 +600,7 @@
 			currstate = "";
 			
 			Dbg.DEBUG_MSG(string.Format("KBEngine::login_baseapp(): connect {0}:{1} is successfully!", ip, port));
+			Event.fireOut("onLoginBaseappResult", new object[]{success});
 
 			hello();
 		}
@@ -1467,6 +1468,9 @@
 			
 			if(_args.isOnInitCallPropertysSetMethods)
 				entity.callPropertysSetMethods();
+
+
+			Event.fireOut("onAccountCreateSuccessed", new object[]{});
 		}
 		
 		public Entity findEntity(Int32 entityID)

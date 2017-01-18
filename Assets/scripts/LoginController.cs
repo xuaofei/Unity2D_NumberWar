@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LoginController : KBEMain {
 
@@ -11,6 +12,9 @@ public class LoginController : KBEMain {
 
 	private string userName;
 	private string userPwd;
+	private float progress = 0.0f;
+	private bool loadMainScene = false;
+	private AsyncOperation loadMainSceneOperation;
 
 	// Use this for initialization
 	void Start () 
@@ -19,7 +23,8 @@ public class LoginController : KBEMain {
 		installEvents();
 		initKBEngine();
 
-	
+		progress = 0.05f;
+
 		if (UserInfo.GetSingleton ().userName == "") {
 			//创建账号
 
@@ -33,43 +38,49 @@ public class LoginController : KBEMain {
 
 			login (UserInfo.GetSingleton ().userName,UserInfo.GetSingleton ().userPwd);
 		}
-
-
-
-		ip = "139.199.189.66";
-
+			
+//		ip = "139.199.189.66";
 
 	}
-		
+
 	public override void installEvents()
 	{
 		o =GameObject.Find ("progress");
 		KBEngine.Event.registerOut("onLoginBaseappFailed", this, "onLoginBaseappFailed");
-		KBEngine.Event.registerOut("onLoginSuccessfully", this, "onLoginSuccessfully");
 		KBEngine.Event.registerOut("onCreateAccountResult", this, "onCreateAccountResult");
 		KBEngine.Event.registerOut("onDisableConnect", this, "onDisableConnect");
-
+		KBEngine.Event.registerOut("onConnectStatus", this, "onConnectStatus");
+		KBEngine.Event.registerOut("onLoginBaseapp", this, "onLoginBaseapp");
+		KBEngine.Event.registerOut("onLoginBaseappResult", this, "onLoginBaseappResult");
+		KBEngine.Event.registerOut("onAccountCreateSuccessed", this, "onAccountCreateSuccessed");
 	}
 
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetKeyUp(KeyCode.Space))
+		float currentPos = o.GetComponent<RectTransform> ().sizeDelta.x + speed * Time.deltaTime;
+		float totalPos = 400.0f;
+		float currentProgress = currentPos / totalPos;
+
+		if (loadMainScene)
 		{
-			
-//			KBEngine.Event.fireIn ("createAccount",stringAccount, stringPasswd);
-			//KBEngine.Event.fireIn ("login",stringAccount, stringPasswd);
+			progress = 50.0f + loadMainSceneOperation.progress / 2;
 		}
 
-
-		if (o.GetComponent<RectTransform> ().sizeDelta.x + speed * Time.deltaTime >= 400f) {
-			o.GetComponent<RectTransform> ().sizeDelta = new Vector2 (400f, o.GetComponent<RectTransform> ().sizeDelta.y);
+		if (currentProgress <= progress) {
+			o.GetComponent<RectTransform> ().sizeDelta = new Vector2 (currentPos, o.GetComponent<RectTransform> ().sizeDelta.y);
 		} else {
-			o.GetComponent<RectTransform>().sizeDelta = new Vector2(o.GetComponent<RectTransform> ().sizeDelta.x + speed * Time.deltaTime,o.GetComponent<RectTransform>().sizeDelta.y);
+			o.GetComponent<RectTransform> ().sizeDelta = new Vector2 (progress*totalPos, o.GetComponent<RectTransform> ().sizeDelta.y);
+		}
+
+		if (currentProgress > 0.99f) {
+			loadMainSceneOperation.allowSceneActivation = true;
+			Destroy (this);
 		}
 	}
 
 	public void onCreateAccountResult(System.UInt16 retcode, byte[] datas)
 	{
+		progress = 0.1f;
 		//注册失败，账号已经存在。
 		if(retcode == 7)
 		{
@@ -80,6 +91,7 @@ public class LoginController : KBEMain {
 		if (retcode == 0 ){
 			UserInfo.GetSingleton ().userName = userName;
 			UserInfo.GetSingleton ().userPwd = userPwd;
+			UserInfo.write2File ();
 
 			login (UserInfo.GetSingleton ().userName,UserInfo.GetSingleton ().userPwd);
 
@@ -97,10 +109,6 @@ public class LoginController : KBEMain {
 		print("onDisableConnect");
 	}
 
-	public void onLoginSuccessfully(System.UInt64 rndUUID, System.Int32 eid, Account accountEntity)
-	{
-		print("login is successfully!(登陆成功!)");
-	}
 
 	private void register(string userName,string userPwd)
 	{
@@ -109,7 +117,35 @@ public class LoginController : KBEMain {
 
 	private void login(string userName,string userPwd)
 	{
-		print ("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
 		KBEngine.Event.fireIn("login", userName, userPwd,System.Text.Encoding.UTF8.GetBytes("kbengine_unity3d_demo"));
+	}
+
+	public void onConnectStatus(bool success)
+	{
+		if(!success)
+			print("connect(" + KBEngineApp.app.getInitArgs().ip + ":" + KBEngineApp.app.getInitArgs().port + ") is error! (连接错误)");
+		else
+			print("connect successfully, please wait...(连接成功，请等候...)");
+	}
+
+	public void onLoginBaseapp()
+	{
+		progress = 0.3f;
+		print("connect to loginBaseapp, please wait...(连接到网关， 请稍后...)");
+	}
+
+	public void onLoginBaseappResult(bool success)
+	{
+		progress = 0.4f;
+	}
+
+	public void onAccountCreateSuccessed()
+	{
+		progress = 0.5f;
+		loadMainSceneOperation = SceneManager.LoadSceneAsync ("main");
+		loadMainSceneOperation.allowSceneActivation = false;
+		loadMainScene = true;
+
+		print("角色创建成功 ，准备跳转到主场景！");
 	}
 }

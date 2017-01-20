@@ -24,8 +24,6 @@ void Start()
 		lineRenderer.endWidth = 0.02f;
 		lineRenderer.startColor = Color.red;
 		lineRenderer.endColor = Color.yellow;
-
-
 }
 
 void Update()
@@ -40,7 +38,7 @@ void Update()
 		//端点数+1
 		LengthOfLineRenderer++;
 		//设置线段的端点数
-			lineRenderer.numPositions = LengthOfLineRenderer;
+		lineRenderer.numPositions = LengthOfLineRenderer;
 
 	}
 	//连续绘制线段
@@ -50,8 +48,6 @@ void Update()
 		lineRenderer.SetPosition(index, position);
 		index++;
 	} 
-
-
 }
 
 void OnGUI()

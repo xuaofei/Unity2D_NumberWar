@@ -48,7 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\scripts\Account.cs" />
      <Compile Include="Assets\scripts\Cell.cs" />
-     <Compile Include="Assets\scripts\DrawMapCell.cs" />
+     <Compile Include="Assets\scripts\CellManager.cs" />
      <Compile Include="Assets\scripts\GameArgs.cs" />
      <Compile Include="Assets\scripts\GameController.cs" />
      <Compile Include="Assets\scripts\GameController1.cs" />

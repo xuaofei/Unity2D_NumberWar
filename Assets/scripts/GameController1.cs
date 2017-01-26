@@ -12,6 +12,14 @@ public class GameController1 : MonoBehaviour,IDragHandler,IBeginDragHandler,IEnd
 	private int dragCellCount;
 	private int maxDragCellCount;
 
+	private Cell begin = null;
+	private Cell turning = null;
+	private Cell end = null;
+	private Cell[] fristSet;
+	private Cell[] secondSet;
+
+	private Direction fristDirection = Direction.Error;
+	private Direction secondDirection = Direction.Error;
 
 	private string showText;
 
@@ -29,42 +37,35 @@ public class GameController1 : MonoBehaviour,IDragHandler,IBeginDragHandler,IEnd
 
 	public void OnBeginDrag (PointerEventData eventData){
 
+		cleanDragCell ();
 
-		Cell cell = eventData.pointerEnter.GetComponent<Cell> ();
-		if (cell){
-			addDragCell (cell);
+		if (eventData.pointerEnter) {
+			Cell cell = eventData.pointerEnter.GetComponent<Cell> ();
+			if (cell){
+				addDragCell (cell);
+			}
 		}
 	}
 
 	public void OnDrag (PointerEventData eventData){
-		Cell cell = eventData.pointerEnter.GetComponent<Cell> ();
-		if (cell){
-			addDragCell (cell);
+		if (eventData.pointerEnter) {
+			Cell cell = eventData.pointerEnter.GetComponent<Cell> ();
+			if (cell){
+				addDragCell (cell);
+			}
 		}
-
-
-//		if (typeof(Cell).IsAssignableFrom(eventData.pointerEnter.GetType()))
-//		{
-//			
-//		}
-//		print (eventData.pointerEnter.GetType());
-
-//		print (eventData.pointerEnter.GetType().FullName);
-//		if(eventData.pointerEnter.gameObject.transform.FindChild ("Text")){
-//			text = eventData.pointerEnter.gameObject.transform.FindChild ("Text").gameObject.GetComponent<Text> ().text;
-//		}
 	}
 
 
 
 
 	public void OnEndDrag (PointerEventData eventData){
-		Cell cell = eventData.pointerEnter.GetComponent<Cell> ();
-		if (cell){
-			addDragCell (cell);
+		if (eventData.pointerEnter) {
+			Cell cell = eventData.pointerEnter.GetComponent<Cell> ();
+			if (cell){
+				addDragCell (cell);
+			}
 		}
-
-		cleanDragCell ();
 	}
 
 
@@ -74,22 +75,35 @@ public class GameController1 : MonoBehaviour,IDragHandler,IBeginDragHandler,IEnd
 
 	void OnGUI()
 	{
+		showText = dragCellCount.ToString ();
+		if(begin){
+			showText += " begin:" + begin.cellPostion.ToString ();
+		}
+
+		if(turning)
+			showText += " turning:" + turning.cellPostion.ToString ();
+
+		if(end){
+			showText += " end:" + end.cellPostion.ToString ();
+		}
+
 		// 文本显示
 		GUIStyle titleStyle2 = new GUIStyle();  
-		titleStyle2.fontSize = 20;  
+		titleStyle2.fontSize = 15;  
 		titleStyle2.normal.textColor = new Color(46f/256f, 163f/256f, 256f/256f, 256f/256f);
 		GUI.Label (new Rect (10,10, 200, 50), showText,titleStyle2);
+
+
+
+		Cell[] validCell = new Cell[dragCellCount];
+		for (int i = 0; i < dragCellCount; i++) {
+			validCell [i] = dragCells [i];
+		}
+
+		cellManager.CanMove(begin,turning,end,validCell);
 	}
 
 	private void addDragCell(Cell cell){
-
-		Cell begin = null;
-		Cell turning = null;
-		Cell end = null;
-
-		Direction fristDirection = Direction.Error;
-		Direction secondDirection = Direction.Error;
-
 
 		if ( dragCellCount >= maxDragCellCount) {
 			return;
@@ -102,16 +116,17 @@ public class GameController1 : MonoBehaviour,IDragHandler,IBeginDragHandler,IEnd
 		}
 
 		if (dragCellCount >= 1) {
+			begin = dragCells [0];
+
 			if (CellPostion.equal (dragCells [dragCellCount - 1].cellPostion, cell.cellPostion)) {
 				return;
 			}
-
-			begin = dragCells [0];
 		}
 			
-		if (dragCellCount == 1) {
+		if (dragCellCount == 1 && CellPostion.neighbor(dragCells [dragCellCount - 1].cellPostion,cell.cellPostion)) {
 			dragCells [dragCellCount] = cell;
 			dragCellCount++;
+			end = dragCells [dragCellCount - 1];
 			return;
 		}
 
@@ -126,7 +141,7 @@ public class GameController1 : MonoBehaviour,IDragHandler,IBeginDragHandler,IEnd
 			
 
 
-		for (int i = 3; i < dragCellCount; i++) {
+		for (int i = 3; i <= dragCellCount; i++) {
 			Direction tempDire = (Direction)CellPostion.moveDirection (dragCells [i - 2].cellPostion,dragCells [i - 1].cellPostion);
 			if (tempDire == Direction.Error){
 				cleanDragCell ();
@@ -134,7 +149,7 @@ public class GameController1 : MonoBehaviour,IDragHandler,IBeginDragHandler,IEnd
 			}
 
 			if (tempDire != fristDirection) {
-				turning = dragCells [i - 1];
+				turning = dragCells [i - 2];
 				//第二次的方向
 				secondDirection = tempDire;
 				break;
@@ -145,32 +160,28 @@ public class GameController1 : MonoBehaviour,IDragHandler,IBeginDragHandler,IEnd
 
 		//新加入的cell的方向
 		Direction newCellDirection = (Direction)CellPostion.moveDirection (dragCells [dragCellCount - 1].cellPostion,cell.cellPostion);
-		print ("fristDirection:"+fristDirection.ToString());
-		print ("newCellDirection:"+newCellDirection.ToString());
+//		print ("fristDirection:"+fristDirection.ToString());
+//		print ("secondDirection:"+secondDirection.ToString());
+//		print ("newCellDirection:"+newCellDirection.ToString());
 
 		if (secondDirection != Direction.Error) {
-			if (newCellDirection == secondDirection) {
+			if (newCellDirection == secondDirection && CellPostion.neighbor(dragCells [dragCellCount - 1].cellPostion,cell.cellPostion)) {
 				dragCells [dragCellCount] = cell;
 				dragCellCount++;
 			}
 		} else {
-			if (newCellDirection == fristDirection) {
+			if (CellPostion.neighbor (dragCells [dragCellCount - 1].cellPostion, cell.cellPostion)) {
+				if (newCellDirection != fristDirection) {
+					turning = dragCells [dragCellCount - 1];
+					secondDirection = newCellDirection;
+				}
+
 				dragCells [dragCellCount] = cell;
 				dragCellCount++;
 			}
 		}
 
 		end = dragCells[dragCellCount - 1];
-
-		showText = dragCellCount.ToString ();
-		showText += "   begin:" + begin.cellPostion.ToString ();
-		if(turning)
-			showText += "   turning:" + turning.cellPostion.ToString ();
-
-		showText += "   end:" + end.cellPostion.ToString ();
-
-
-		print ("showText:" + showText);
 	}
 
 
@@ -180,6 +191,13 @@ public class GameController1 : MonoBehaviour,IDragHandler,IBeginDragHandler,IEnd
 		}
 
 		dragCellCount = 0;
+		begin = null;
+		turning = null;
+		end = null;
+		fristDirection = Direction.Error;
+		secondDirection = Direction.Error;
+
+		cellManager.cancelSelected ();
 	}
 
 	private void updateDragCell(){
@@ -203,7 +221,5 @@ public class GameController1 : MonoBehaviour,IDragHandler,IBeginDragHandler,IEnd
 				}
 			}
 		}
-
-		cellManager.CanMove(begin,turning,end);
 	}
 }

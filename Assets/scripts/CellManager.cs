@@ -10,6 +10,8 @@ public class CellManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		cellPrefab = Resources.Load ("perfabs/cell", typeof(GameObject)) as GameObject;
+
 		int cellBudgetWitdh = (int)(Screen.width - GameArgs.minMargin * 2) / GameArgs.cols;
 		int cellBudgetHeight = (int)(Screen.height - GameArgs.minMargin * 2) / GameArgs.rows;
 		//单个卡牌边长
@@ -28,25 +30,18 @@ public class CellManager : MonoBehaviour {
 		grid.padding = new RectOffset (hMargin,hMargin,vMargin,vMargin);
 		grid.spacing = new Vector2 (1f,1f);
 
-		cells = new Cell[GameArgs.rows,GameArgs.cols];
+		cells = new Cell[GameArgs.cols,GameArgs.rows];
 		for (int i = 0; i < GameArgs.rows; i++){
 			for (int j = 0; j < GameArgs.cols; j++){
 				GameObject tempObject = Instantiate (cellPrefab);
+
 				Cell cell = tempObject.GetComponent<Cell> ();
-				cell.cellPostion.x = j;
-				cell.cellPostion.y = i;
-				cells [i, j] = cell;
+				cell.cellPostion.x = j + 1;
+				cell.cellPostion.y = GameArgs.rows - i;
+				cell.setTitle (cell.cellPostion.ToString());
 
-
-//				tempObject.transform.FindChild ("Text").gameObject.GetComponent<Text> ().text = i.ToString () + "-" + j.ToString ();
-
-//				GameObject tempObject = new GameObject ();
+				cells [j, GameArgs.rows - i - 1] = cell;
 				tempObject.transform.SetParent(transform);
-//				tempObject.AddComponent<Image> ();
-//
-//				Image image = tempObject.GetComponent<Image> ();
-//				image.overrideSprite = Resources.Load ("sprites/159-mac-shadow.png") as Sprite;
-//				image.color = new Color (0.2f,0.5f,0.8f);
 			}
 		}
 	}
@@ -64,18 +59,162 @@ public class CellManager : MonoBehaviour {
 	}
 
 	public bool CanMove(Vector2 begin,Vector2 turning, Vector2 end){
+
+
 		return true;
 	}
 
 	public void Move(Cell begin,Cell turning, Cell end){
 
 	}
+	//,Cell[] fristSet,Cell[] secondSet
+	public bool CanMove(Cell begin,Cell turning, Cell end,Cell[] cells){
+		CellPostion beginPos = CellPostion.ErrorCellPostion();
+		CellPostion turningPos = CellPostion.ErrorCellPostion();
+		CellPostion endPos = CellPostion.ErrorCellPostion();
 
-	public bool CanMove(Cell begin,Cell turning, Cell end){
+		Direction fristDirection = Direction.Error;
+		Direction secondDirection = Direction.Error;
+
+		if (begin) {
+			beginPos = begin.cellPostion;
+			begin.selected (true);
+		} else {
+			return false;
+		}
+
+		if (end) {
+			endPos = end.cellPostion;
+		} else {
+			return false;
+		}
+			
+		if (begin && turning && end) {
+			turningPos = turning.cellPostion;
+			fristDirection = (Direction)CellPostion.moveDirection (beginPos, turningPos);
+			secondDirection = (Direction)CellPostion.moveDirection (turningPos, endPos);
+		} else if(begin && end){
+			fristDirection = (Direction)CellPostion.moveDirection (beginPos, endPos);
+		}
+
+
+		//标记出第一条线的格子
+		Cell tempCell = begin;
+		CellPostion nextPos = CellPostion.ErrorCellPostion();
+
+		if (turning) {
+			//第一条线
+			while (tempCell != turning) {
+				switch (fristDirection) {
+				case Direction.Up:
+					nextPos = CellPostion.getUp (tempCell.cellPostion);
+					break;
+				case Direction.Down:
+					nextPos = CellPostion.getDown (tempCell.cellPostion);
+					break;
+				case Direction.Left:
+					nextPos = CellPostion.getLeft (tempCell.cellPostion);
+					break;
+				case Direction.Right:
+					nextPos = CellPostion.getRight (tempCell.cellPostion);
+					break;
+
+				default:
+					break;
+				}
+
+				if (CellPostion.equal (nextPos, CellPostion.ErrorCellPostion ())) {
+					return false;
+				} else {
+					tempCell = getCell (nextPos);
+					tempCell.selected (true);
+				}
+			} 
+
+//			turning.selected (true);
+
+
+			//第二条线
+			tempCell = turning;
+			while (tempCell != end) {
+				switch (secondDirection) {
+				case Direction.Up:
+					nextPos = CellPostion.getUp (tempCell.cellPostion);
+					break;
+				case Direction.Down:
+					nextPos = CellPostion.getDown (tempCell.cellPostion);
+					break;
+				case Direction.Left:
+					nextPos = CellPostion.getLeft (tempCell.cellPostion);
+					break;
+				case Direction.Right:
+					nextPos = CellPostion.getRight (tempCell.cellPostion);
+					break;
+
+				default:
+					break;
+				}
+
+				if (CellPostion.equal (nextPos, CellPostion.ErrorCellPostion ())) {
+					return false;
+				} else {
+					tempCell = getCell (nextPos);
+					tempCell.selected (true);
+				}
+			}
+		}else {
+			tempCell = begin;
+			while (tempCell != end) {
+				switch (fristDirection) {
+				case Direction.Up:
+					nextPos = CellPostion.getUp (tempCell.cellPostion);
+					break;
+				case Direction.Down:
+					nextPos = CellPostion.getDown (tempCell.cellPostion);
+					break;
+				case Direction.Left:
+					nextPos = CellPostion.getLeft (tempCell.cellPostion);
+					break;
+				case Direction.Right:
+					nextPos = CellPostion.getRight (tempCell.cellPostion);
+					break;
+
+				default:
+					break;
+				}
+
+				if (CellPostion.equal (nextPos, CellPostion.ErrorCellPostion ())) {
+					return false;
+				} else {
+					tempCell = getCell (nextPos);
+					tempCell.selected (true);
+				}
+			}
+		}
+
+//		end.selected (true);
+//
+//		foreach (Cell cell in cells) {
+//			cell.selected (true);
+//		}
+			
+
 		return true;
 	}
 
-	private Cell getCell (Vector2 postion){
+	public void cancelSelected(){
+		for (int i = 0; i < GameArgs.rows; i++) {
+			for (int j = 0; j < GameArgs.cols; j++) {
+				cells [j, i].selected (false);
+			}
+		}
+	}
+
+	private Cell getCell (CellPostion postion){
+		if (postion.x >= 1 && postion.x <= GameArgs.cols && postion.y >= 1 && postion.y <= GameArgs.rows) {
+			return cells [(int)postion.x - 1, (int)postion.y - 1];
+		}
+
 		return null;
 	}
 }

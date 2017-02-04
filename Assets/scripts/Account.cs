@@ -20,5 +20,6 @@ public class Account : KBEngine.Entity  {
 	public void onTestFunction(string s) {
 		Debug.Log ("fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
 //		baseCall ("reqAvatarList");
+		cellCall ("onAccountCell");
 	}
 }

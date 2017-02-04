@@ -53,6 +53,7 @@ public class LoginController : KBEMain {
 		KBEngine.Event.registerOut("onLoginBaseapp", this, "onLoginBaseapp");
 		KBEngine.Event.registerOut("onLoginBaseappResult", this, "onLoginBaseappResult");
 		KBEngine.Event.registerOut("onAccountCreateSuccessed", this, "onAccountCreateSuccessed");
+		KBEngine.Event.registerOut("onLoginFailed", this, "onLoginFailed");
 	}
 
 	// Update is called once per frame
@@ -147,5 +148,17 @@ public class LoginController : KBEMain {
 		loadMainScene = true;
 
 		print("角色创建成功 ，准备跳转到主场景！");
+	}
+
+	public void onLoginFailed(System.UInt16 failedcode)
+	{
+		if(failedcode == 20)
+		{
+			print("login is failed(登陆失败), err=" + KBEngineApp.app.serverErr(failedcode) + ", " + System.Text.Encoding.ASCII.GetString(KBEngineApp.app.serverdatas()));
+		}
+		else
+		{
+			print("login is failed(登陆失败), err=" + KBEngineApp.app.serverErr(failedcode));
+		}
 	}
 }

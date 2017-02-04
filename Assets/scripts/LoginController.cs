@@ -54,6 +54,7 @@ public class LoginController : KBEMain {
 		KBEngine.Event.registerOut("onLoginBaseappResult", this, "onLoginBaseappResult");
 		KBEngine.Event.registerOut("onAccountCreateSuccessed", this, "onAccountCreateSuccessed");
 		KBEngine.Event.registerOut("onLoginFailed", this, "onLoginFailed");
+		KBEngine.Event.registerOut("onEnterWorld", this, "onEnterWorld");
 	}
 
 	// Update is called once per frame
@@ -74,8 +75,8 @@ public class LoginController : KBEMain {
 		}
 
 		if (currentProgress > 0.99f) {
-			loadMainSceneOperation.allowSceneActivation = true;
-			Destroy (this);
+//			loadMainSceneOperation.allowSceneActivation = true;
+//			Destroy (this);
 		}
 	}
 
@@ -160,5 +161,29 @@ public class LoginController : KBEMain {
 		{
 			print("login is failed(登陆失败), err=" + KBEngineApp.app.serverErr(failedcode));
 		}
+	}
+
+	public void onEnterWorld(KBEngine.Entity entity)
+	{
+		//entity为Account
+		Debug.LogError ("onEnterWorld");
+		print("onEnterWorld");
+
+		entity.baseCall ("reqAvatarList");
+		print("onEnterWorld2");
+
+		if(entity.isPlayer())
+			return;
+
+	
+
+//		float y = entity.position.y;
+//		if(entity.isOnGround)
+//			y = 1.3f;
+//
+//		entity.renderObj = Instantiate(entityPerfab, new Vector3(entity.position.x, y, entity.position.z), 
+//			Quaternion.Euler(new Vector3(entity.direction.y, entity.direction.z, entity.direction.x))) as UnityEngine.GameObject;
+//
+//		((UnityEngine.GameObject)entity.renderObj).name = entity.className + "_" + entity.id;
 	}
 }

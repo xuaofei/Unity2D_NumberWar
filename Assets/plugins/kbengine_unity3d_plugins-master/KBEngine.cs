@@ -1708,6 +1708,7 @@
 				entity.className = entityType;
 				
 				entity.cellMailbox = new Mailbox();
+				Debug.Log ("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
 				entity.cellMailbox.id = eid;
 				entity.cellMailbox.className = entityType;
 				entity.cellMailbox.type = Mailbox.MAILBOX_TYPE.MAILBOX_TYPE_CELL;
@@ -1740,7 +1741,8 @@
 					_entityIDAliasIDList.Clear();
 					clearEntities(false);
 					entities[entity.id] = entity;
-				
+
+					Debug.Log ("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
 					entity.cellMailbox = new Mailbox();
 					entity.cellMailbox.id = eid;
 					entity.cellMailbox.className = entityType;
@@ -1797,6 +1799,7 @@
 
 				entities.Remove(eid);
 				entity.onDestroy();
+				Debug.LogError ("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
 				_entityIDAliasIDList.Remove(eid);
 			}
 		}
@@ -2039,7 +2042,7 @@
 		public void clearEntities(bool isall)
 		{
 			_controlledEntities.Clear();
-
+			Debug.LogError ("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
 			if (!isall)
 			{
 				Entity entity = player();
@@ -2154,6 +2157,8 @@
 
 			entities.Remove(eid);
 			entity.onDestroy();
+
+			Debug.LogError ("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
 		}
 		
 		/*

@@ -17,9 +17,22 @@ public class Account : KBEngine.Entity  {
 
 
 
-	public void onTestFunction(string s) {
+	public void onBaseTestFunction(string s) {
 		Debug.Log ("fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
 //		baseCall ("reqAvatarList");
-		cellCall ("onAccountCell");
+//		cellCall ("onAccountCell");
+	}
+
+
+	public void onCellTestFunction(string s) {
+		Debug.Log ("ddddddddddddddddddddddddddddddddddddddddddddddddddddddd");
+		//		baseCall ("reqAvatarList");
+//		cellCall ("onAccountCell");
+	}
+
+
+	public override void onEnterWorld(){
+	
+		Debug.Log ("onEnterWorldonEnterWorldonEnterWorldonEnterWorldonEnterWorld");
 	}
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using UnityEngine;
 
 
 [Serializable]
@@ -31,19 +32,51 @@ public class UserInfo
 	public static void readFromFile()
 	{
 		BinaryFormatter formater = new BinaryFormatter();
-		Stream stream = new FileStream("account.bin", FileMode.Open,FileAccess.Read, FileShare.None);
-		if (stream.Length == 0) {
-			_singleton = new UserInfo ();
-		} else {
-			_singleton = (UserInfo)formater.Deserialize(stream);
+		string path;
+		if(Application.platform==RuntimePlatform.IPhonePlayer)
+		{
+			path = Application.persistentDataPath + "/";
+//			path = Application.dataPath.Substring (0, Application.dataPath.Length - 5);
+//			path = path.Substring(0, path.LastIndexOf('/'))+"/Documents/";    
 		}
-		stream.Close();
+		else
+		{
+			path=Application.dataPath+"/Resource/GameData/";
+		}
+
+		path = path + "account.bin";
+
+		FileInfo myFile = new FileInfo (path);
+		if (myFile.Exists) {
+			Stream stream = new FileStream (path, FileMode.Open, FileAccess.Read, FileShare.None);
+			if (stream.Length == 0) {
+				_singleton = new UserInfo ();
+			} else {
+				_singleton = (UserInfo)formater.Deserialize (stream);
+			}
+			stream.Close ();
+		} else {
+			_singleton = new UserInfo ();
+		}
 	}
 
 	public static void write2File()
 	{
 		BinaryFormatter formater = new BinaryFormatter();
-		Stream stream = new FileStream("account.bin", FileMode.Create,FileAccess.Write, FileShare.None);
+		string path = "";
+		if(Application.platform==RuntimePlatform.IPhonePlayer)
+		{
+			path = Application.persistentDataPath + "/";
+//			path= Application.dataPath.Substring (0, Application.dataPath.Length - 5);
+//			path = path.Substring(0, path.LastIndexOf('/'))+"/Documents/";    
+		}
+		else
+		{
+			//path=Application.dataPath+"/Resource/GameData/";
+		}
+		path = path + "account.bin";
+
+		Stream stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
 		formater.Serialize(stream, UserInfo.GetSingleton());
 		stream.Close();
 	}
@@ -64,7 +97,7 @@ public class UserInfo
 	{
 		byte[] b = new byte[4];
 		new System.Security.Cryptography.RNGCryptoServiceProvider().GetBytes(b);
-		Random r = new Random(BitConverter.ToInt32(b, 0));
+		System.Random r = new System.Random(BitConverter.ToInt32(b, 0));
 		string s = null, str = custom;
 		if (useNum == true) { str += "0123456789"; }
 		if (useLow == true) { str += "abcdefghijklmnopqrstuvwxyz"; }

@@ -1799,7 +1799,6 @@
 
 				entities.Remove(eid);
 				entity.onDestroy();
-				Debug.LogError ("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
 				_entityIDAliasIDList.Remove(eid);
 			}
 		}
@@ -2042,7 +2041,6 @@
 		public void clearEntities(bool isall)
 		{
 			_controlledEntities.Clear();
-			Debug.LogError ("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
 			if (!isall)
 			{
 				Entity entity = player();
@@ -2157,8 +2155,6 @@
 
 			entities.Remove(eid);
 			entity.onDestroy();
-
-			Debug.LogError ("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
 		}
 		
 		/*

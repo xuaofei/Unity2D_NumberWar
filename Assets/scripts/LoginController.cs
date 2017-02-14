@@ -75,6 +75,7 @@ public class LoginController : KBEMain {
 		}
 
 		if (currentProgress > 0.99f) {
+			
 //			loadMainSceneOperation.allowSceneActivation = true;
 //			Destroy (this);
 		}

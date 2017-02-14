@@ -13,26 +13,18 @@ public class Account : KBEngine.Entity  {
 
 		Debug.Log ("Player 已经创建成功！");
 		account = this;
+
+
+		//进入大厅
+		baseCall ("enterHall");
+		Debug.Log ("enterHall");
 	}
 
-
-
-	public void onBaseTestFunction(string s) {
-		Debug.Log ("fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-//		baseCall ("reqAvatarList");
-//		cellCall ("onAccountCell");
+	public void enterHallSuccessd(){
+		
 	}
 
+	public void enterHallFailed(){
 
-	public void onCellTestFunction(string s) {
-		Debug.Log ("ddddddddddddddddddddddddddddddddddddddddddddddddddddddd");
-		//		baseCall ("reqAvatarList");
-//		cellCall ("onAccountCell");
-	}
-
-
-	public override void onEnterWorld(){
-	
-		Debug.Log ("onEnterWorldonEnterWorldonEnterWorldonEnterWorldonEnterWorld");
 	}
 }

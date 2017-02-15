@@ -51,25 +51,25 @@
      <Compile Include="Assets\scripts\CellManager.cs" />
      <Compile Include="Assets\scripts\GameArgs.cs" />
      <Compile Include="Assets\scripts\GameController.cs" />
-     <Compile Include="Assets\scripts\GameController1.cs" />
      <Compile Include="Assets\scripts\LoginController.cs" />
      <Compile Include="Assets\scripts\MainController.cs" />
+     <Compile Include="Assets\scripts\Player.cs" />
      <Compile Include="Assets\scripts\Room.cs" />
      <Compile Include="Assets\scripts\UserInfo.cs" />
      <Compile Include="Assets\scripts\Waiter.cs" />
      <Compile Include="Assets\scripts\drawGrid.cs" />
      <Compile Include="Assets\scripts\drawGrid_clone.cs" />
- <Reference Include="UnityEngine.Analytics">
- <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.PlaymodeTestsRunner">
- <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/PlaymodeTestsRunner/UnityEngine.PlaymodeTestsRunner.dll</HintPath>
+ <Reference Include="UnityEngine.UI">
+ <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
  </Reference>
- <Reference Include="UnityEngine.UI">
- <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
+ <Reference Include="UnityEngine.PlaymodeTestsRunner">
+ <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/PlaymodeTestsRunner/UnityEngine.PlaymodeTestsRunner.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.Analytics">
+ <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.HoloLens">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/UnityHoloLens/RuntimeEditor/UnityEngine.HoloLens.dll</HintPath>

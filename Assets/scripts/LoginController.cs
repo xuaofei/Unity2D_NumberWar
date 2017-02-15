@@ -6,60 +6,59 @@ using UnityEngine.SceneManagement;
 
 public class LoginController : KBEMain {
 
-	private GameObject o;
+	private GameObject progressObject;
 	public float speed = 50;
 
 
 	private string userName;
 	private string userPwd;
-	private float progress = 0.0f;
+	public float progress = 0.0f;
 	private bool loadMainScene = false;
 	private AsyncOperation loadMainSceneOperation;
 
 	// Use this for initialization
+
+	//定义 WaitAndPrint（）方法  
+	IEnumerator WaitAndPrint(float waitTime)  
+	{  
+
+
+		yield return new WaitForSeconds(waitTime);  
+		//等待之后执行的动作  
+		loadMainSceneOperation = SceneManager.LoadSceneAsync ("main");
+		loadMainSceneOperation.allowSceneActivation = false;
+		loadMainScene = true;
+
+	}
+
+
+	IEnumerator Wait(float waitTime)  
+	{  
+		yield return new WaitForSeconds(waitTime);  
+
+		Main.GetSingleton ().Start ();
+
+	}    
+
+
 	void Start () 
 	{
-		MonoBehaviour.print("clientapp::start()");
-		installEvents();
+		Main.GetSingleton ().loginController (this);
 		initKBEngine();
 
-		progress = 0.05f;
+		StartCoroutine(Wait(1.0F));
+		StartCoroutine(WaitAndPrint(3.0F));
 
-		if (UserInfo.GetSingleton ().userName == "") {
-			//创建账号
-
-			userName = System.Guid.NewGuid().ToString("N");
-			userPwd = System.Guid.NewGuid ().ToString ("N").Substring (0,16);
-
-			register(userName,userPwd);
-
-		} else {
-			//直接登录
-
-			login (UserInfo.GetSingleton ().userName,UserInfo.GetSingleton ().userPwd);
-		}
-			
-//		ip = "139.199.189.66";
-
+		loadMainScene = false;
+		progressObject = GameObject.Find ("progress");
 	}
 
-	public override void installEvents()
-	{
-		o =GameObject.Find ("progress");
-		KBEngine.Event.registerOut("onLoginBaseappFailed", this, "onLoginBaseappFailed");
-		KBEngine.Event.registerOut("onCreateAccountResult", this, "onCreateAccountResult");
-		KBEngine.Event.registerOut("onDisableConnect", this, "onDisableConnect");
-		KBEngine.Event.registerOut("onConnectStatus", this, "onConnectStatus");
-		KBEngine.Event.registerOut("onLoginBaseapp", this, "onLoginBaseapp");
-		KBEngine.Event.registerOut("onLoginBaseappResult", this, "onLoginBaseappResult");
-		KBEngine.Event.registerOut("onAccountCreateSuccessed", this, "onAccountCreateSuccessed");
-		KBEngine.Event.registerOut("onLoginFailed", this, "onLoginFailed");
-		KBEngine.Event.registerOut("onEnterWorld", this, "onEnterWorld");
-	}
+
 
 	// Update is called once per frame
 	void Update () {
-		float currentPos = o.GetComponent<RectTransform> ().sizeDelta.x + speed * Time.deltaTime;
+		
+		float currentPos = progressObject.GetComponent<RectTransform> ().sizeDelta.x + speed * Time.deltaTime;
 		float totalPos = 400.0f;
 		float currentProgress = currentPos / totalPos;
 
@@ -69,122 +68,16 @@ public class LoginController : KBEMain {
 		}
 
 		if (currentProgress <= progress) {
-			o.GetComponent<RectTransform> ().sizeDelta = new Vector2 (currentPos, o.GetComponent<RectTransform> ().sizeDelta.y);
+			progressObject.GetComponent<RectTransform> ().sizeDelta = new Vector2 (currentPos, progressObject.GetComponent<RectTransform> ().sizeDelta.y);
 		} else {
-			o.GetComponent<RectTransform> ().sizeDelta = new Vector2 (progress*totalPos, o.GetComponent<RectTransform> ().sizeDelta.y);
+			progressObject.GetComponent<RectTransform> ().sizeDelta = new Vector2 (progress*totalPos, progressObject.GetComponent<RectTransform> ().sizeDelta.y);
 		}
 
 		if (currentProgress > 0.99f) {
 			
-//			loadMainSceneOperation.allowSceneActivation = true;
-//			Destroy (this);
+			loadMainSceneOperation.allowSceneActivation = true;
+			Destroy (this);
 		}
 	}
 
-	public void onCreateAccountResult(System.UInt16 retcode, byte[] datas)
-	{
-		progress = 0.1f;
-		//注册失败，账号已经存在。
-		if(retcode == 7)
-		{
-			//createAccount is error(注册账号错误)! err=SERVER_ERR_ACCOUNT_CREATE_FAILED [创建账号失败（已经存在一个相同的账号）。]
-			print("createAccount is error(注册账号错误)! err=" + KBEngineApp.app.serverErr(retcode));
-		}
-
-		if (retcode == 0 ){
-			UserInfo.GetSingleton ().userName = userName;
-			UserInfo.GetSingleton ().userPwd = userPwd;
-			UserInfo.write2File ();
-
-			login (UserInfo.GetSingleton ().userName,UserInfo.GetSingleton ().userPwd);
-
-			print("createAccount is successfully!(注册账号成功!)");
-		}
-	}
-
-	public void onLoginBaseappFailed(System.UInt16 failedcode)
-	{
-		print("loginBaseapp is failed(登陆网关失败), err=" + KBEngineApp.app.serverErr(failedcode));
-	}
-
-	public void onDisableConnect()
-	{
-		print("onDisableConnect");
-	}
-
-
-	private void register(string userName,string userPwd)
-	{
-		KBEngine.Event.fireIn("createAccount", userName, userPwd,System.Text.Encoding.UTF8.GetBytes("kbengine_unity3d_demo"));
-	}
-
-	private void login(string userName,string userPwd)
-	{
-		KBEngine.Event.fireIn("login", userName, userPwd,System.Text.Encoding.UTF8.GetBytes("kbengine_unity3d_demo"));
-	}
-
-	public void onConnectStatus(bool success)
-	{
-		if(!success)
-			print("connect(" + KBEngineApp.app.getInitArgs().ip + ":" + KBEngineApp.app.getInitArgs().port + ") is error! (连接错误)");
-		else
-			print("connect successfully, please wait...(连接成功，请等候...)");
-	}
-
-	public void onLoginBaseapp()
-	{
-		progress = 0.3f;
-		print("connect to loginBaseapp, please wait...(连接到网关， 请稍后...)");
-	}
-
-	public void onLoginBaseappResult(bool success)
-	{
-		progress = 0.4f;
-	}
-
-	public void onAccountCreateSuccessed()
-	{
-		progress = 0.5f;
-		loadMainSceneOperation = SceneManager.LoadSceneAsync ("main");
-		loadMainSceneOperation.allowSceneActivation = false;
-		loadMainScene = true;
-
-		print("角色创建成功 ，准备跳转到主场景！");
-	}
-
-	public void onLoginFailed(System.UInt16 failedcode)
-	{
-		if(failedcode == 20)
-		{
-			print("login is failed(登陆失败), err=" + KBEngineApp.app.serverErr(failedcode) + ", " + System.Text.Encoding.ASCII.GetString(KBEngineApp.app.serverdatas()));
-		}
-		else
-		{
-			print("login is failed(登陆失败), err=" + KBEngineApp.app.serverErr(failedcode));
-		}
-	}
-
-	public void onEnterWorld(KBEngine.Entity entity)
-	{
-		//entity为Account
-		Debug.LogError ("onEnterWorld");
-		print("onEnterWorld");
-
-		entity.baseCall ("reqAvatarList");
-		print("onEnterWorld2");
-
-		if(entity.isPlayer())
-			return;
-
-	
-
-//		float y = entity.position.y;
-//		if(entity.isOnGround)
-//			y = 1.3f;
-//
-//		entity.renderObj = Instantiate(entityPerfab, new Vector3(entity.position.x, y, entity.position.z), 
-//			Quaternion.Euler(new Vector3(entity.direction.y, entity.direction.z, entity.direction.x))) as UnityEngine.GameObject;
-//
-//		((UnityEngine.GameObject)entity.renderObj).name = entity.className + "_" + entity.id;
-	}
 }

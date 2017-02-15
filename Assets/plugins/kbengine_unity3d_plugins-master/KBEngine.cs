@@ -1468,9 +1468,6 @@
 			
 			if(_args.isOnInitCallPropertysSetMethods)
 				entity.callPropertysSetMethods();
-
-
-			Event.fireOut("onAccountCreateSuccessed", new object[]{});
 		}
 		
 		public Entity findEntity(Int32 entityID)

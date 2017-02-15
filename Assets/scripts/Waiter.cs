@@ -24,7 +24,7 @@ public class Waiter : KBEngine.Entity {
 			Debug.Log (notice);
 		}
 		Debug.Log ("getHallNoticeResult__Client:" + noticeList.ToString());
-		baseCall ("MatchPlayer");
+//		baseCall ("MatchPlayer");
 	}
 
 	public void DebugClientFunction(string s){
